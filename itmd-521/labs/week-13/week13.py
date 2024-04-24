@@ -56,7 +56,7 @@ splitDF.show(5)
 
 temp_df = splitDF.filter((splitDF["AirTemperature"] >= -40) & (splitDF["AirTemperature"] <= 50))
 
-ymfilter_df = df.select(
+ymfilter_df = temp_df.select(
     year("ObservationDate").alias("year"),
     month("ObservationDate").alias("month"),
     "AirTemperature"
