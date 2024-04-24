@@ -18,7 +18,7 @@ conf.set("spark.hadoop.fs.s3a.endpoint", "http://infra-minio-proxy-vm0.service.c
 # Setting the legacy time parser policy to handle date parsing issues
 # conf.set("spark.sql.legacy.timeParserPolicy", "LEGACY")
 
-spark = SparkSession.builder.appName("vvittanala convert 90.text to csv part 2").config('spark.driver.host', 'spark-edge.service.consul').config(conf=conf).getOrCreate()
+spark = SparkSession.builder.appName("vvittanala convert 90.text to csv part 3").config('spark.driver.host', 'spark-edge.service.consul').config(conf=conf).getOrCreate()
 
 df = spark.read.csv('s3a://itmd521/90.txt')
 
@@ -66,7 +66,13 @@ avg_df = ymfilter_df.groupBy("year", "month").agg(avg("AirTemperature").alias("a
 
 sdev_df = ymfilter_df.groupBy("month").agg(stddev("AirTemperature").alias("stddev_temperature"))
 # Join average and standard deviation DataFrames
-result_df = avg_df.join(sdev_df, ["month"])
+joined_df = avg_df.join(sdev_df, ["year", "month"], "inner")
+
+# Select the desired columns
+result_df = joined_df.select("avg_temperature", "stddev_temperature", "month", "year")
+
+# Show the resulting DataFrame
+result_df.show(12)
 result_df.write.format("parquet").mode("overwrite").option("header","true").save("s3a://vvittanala/part-three.parquet")
 
 
