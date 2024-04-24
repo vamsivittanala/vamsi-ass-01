@@ -45,13 +45,40 @@ splitDF = df.withColumn('WeatherStation', df['_c0'].substr(5, 6)) \
 splitDF.printSchema()
 splitDF.show(5)
 
-splitDF.write.format("csv").mode("overwrite").option("header", "true").save("s3a://vvittanala/90-uncompressed.csv")
-splitDF.write.format("csv").mode("overwrite").option("header", "true").option("compression", "lz4").save("s3a://vvittanala/90-compressed.csv")
+# splitDF.write.format("csv").mode("overwrite").option("header", "true").save("s3a://vvittanala/90-uncompressed.csv")
+# splitDF.write.format("csv").mode("overwrite").option("header", "true").option("compression", "lz4").save("s3a://vvittanala/90-compressed.csv")
 
 
-cols_df = splitDF.coalesce(1)
-cols_df.write.format("csv").mode("overwrite").option("header", "true").save("s3a://vvittanala/90.csv")
+# cols_df = splitDF.coalesce(1)
+# cols_df.write.format("csv").mode("overwrite").option("header", "true").save("s3a://vvittanala/90.csv")
 
-splitDF.write.format("parquet").mode("overwrite").option("header", "true").save("s3a://vvittanala/90.parquet")
+# splitDF.write.format("parquet").mode("overwrite").option("header", "true").save("s3a://vvittanala/90.parquet")
+
+temp_df = splitDF.filter((splitDF["AirTemperature"] >= -40) & (splitDF["AirTemperature"] <= 50))
+
+ymfilter_df = df.select(
+    year("ObservationDate").alias("year"),
+    month("ObservationDate").alias("month"),
+    "AirTemperature"
+)
+
+avg_df = ymfilter_df.groupBy("year", "month").agg(avg("AirTemperature").alias("avg_temperature"))
+
+sdev_df = ymfilter_df.groupBy("month").agg(stddev("AirTemperature").alias("stddev_temperature"))
+# Join average and standard deviation DataFrames
+result_df = avg_df.join(sdev_df, ["month"])
+result_df.write.format("parquet").mode("overwrite").option("header","true").save("s3a://vvittanala/part-three.parquet")
+
+
+
+first_year_df = sdev_df.limit(12)
+
+# Write to CSV file
+
+first_year_df.write.format("csv").mode("overwrite").option("header","true").save("s3a://vvittanala/part3-three.csv")
+
+
+# Show the first 12 records (for verification)
+first_year_df.show(12)
 
 spark.stop()
