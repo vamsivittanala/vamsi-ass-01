@@ -64,7 +64,9 @@ ymfilter_df = temp_df.select(
 
 avg_df = ymfilter_df.groupBy("year", "month").agg(avg("AirTemperature").alias("avg_temperature"))
 
-sdev_df = ymfilter_df.groupBy("month").agg(stddev("AirTemperature").alias("stddev_temperature"))
+
+sdev_df = ymfilter_df.groupBy("year", "month").agg(stddev("AirTemperature").alias("stddev_temperature"))
+
 # Join average and standard deviation DataFrames
 joined_df = avg_df.join(sdev_df, ["year", "month"], "inner")
 
