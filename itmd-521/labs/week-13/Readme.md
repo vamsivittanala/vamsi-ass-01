@@ -116,6 +116,8 @@ Take only 12 records (the month and standard deviations) and write this to csv f
 Using your assigned dataset, find the Average temperature per month per year. Then find the standard deviation of each temperature over the course of the decade per month. Write these results out as a Parquet file named: `part-three.parquet`. Make use of Pyspark functions covered in the `Learning Spark v2` book as well as the Pyspark documentation. Do not use AI/GPT or copy and paste from the internet. Comment your code to explain how and why you are using it. **Strip out** invalid Temperature records. 
 
 Take only 12 records (the month and standard deviations) and write this to csv file named `part-three.csv`
+## Part Three Screenshot
+
 
 !["part3"](./images-week-13/part3.png "Part3")
 
