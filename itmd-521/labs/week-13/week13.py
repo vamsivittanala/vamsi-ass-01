@@ -55,14 +55,18 @@ splitDF.show(5)
 # splitDF.write.format("parquet").mode("overwrite").option("header", "true").save("s3a://vvittanala/90.parquet")
 
 temp_df = splitDF.filter((splitDF["AirTemperature"] >= -40) & (splitDF["AirTemperature"] <= 50))
+# created a temp_df variable to filter temperature values in human survival values
 
 ymfilter_df = temp_df.select(
     year("ObservationDate").alias("year"),
     month("ObservationDate").alias("month"),
     "AirTemperature"
 )
+# selected a columns as ObservationDate, AirTemperture and extracted it into a year & month column
 
 avg_df = ymfilter_df.groupBy("year", "month").agg(avg("AirTemperature").alias("avg_temperature"))
+
+stdev_df = avg_df.agg(stddev("avg_temperature").alias("stddev_temperature"))
 
 
 sdev_df = ymfilter_df.groupBy("year", "month").agg(stddev("AirTemperature").alias("stddev_temperature"))
