@@ -34,8 +34,12 @@ ymfilter_df = temp_df.select(
 avg_df = ymfilter_df.groupBy("year", "month").agg(avg("AirTemperature").alias("avg_temperature"))
 
 stdev_df = avg_df.select("month","avg_temperature").groupBy("month").agg(stddev("avg_temperature").alias("stddev_temperature")).orderBy("month")
-
 stdev_df.show(15)
+stdev_df.write.format("parquet").mode("overwrite").option("header", "true").save("s3a://vvittanala/part-three.parquet")
+
+new_df = stdev_df
+new_df.write.format("csv").mode("overwrite").option("header","true").save("s3a://vvittanala/part-three.csv")
+
 
 
 spark.stop()
