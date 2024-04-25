@@ -21,6 +21,8 @@ conf.set("spark.hadoop.fs.s3a.endpoint", "http://infra-minio-proxy-vm0.service.c
 spark = SparkSession.builder.appName("vvittanala convert 90.text to csv part 3").config('spark.driver.host', 'spark-edge.service.consul').config(conf=conf).getOrCreate()
 
 splitDF = spark.read.parquet('s3a://vvittanala/90.parquet')
+
+
 temp_df = splitDF.filter((splitDF["AirTemperature"] >= -40) & (splitDF["AirTemperature"] <= 50))
 # created a temp_df variable to filter temperature values in human survival values
 
@@ -32,13 +34,17 @@ ymfilter_df = temp_df.select(
 # selected a columns as ObservationDate, AirTemperture and extracted it into a year & month colum
 
 avg_df = ymfilter_df.groupBy("year", "month").agg(avg("AirTemperature").alias("avg_temperature"))
-
+# found average temperature of Airtemperature by using Aggregate function as avg
 stdev_df = avg_df.select("month","avg_temperature").groupBy("month").agg(stddev("avg_temperature").alias("stddev_temperature")).orderBy("month")
-stdev_df.show(15)
+# founded standard deviation of average temperature by using Aggregate function as stddev
+
 stdev_df.write.format("parquet").mode("overwrite").option("header", "true").save("s3a://vvittanala/part-three.parquet")
+# written stdev_df as aparquet file in s3a bucket
 
 new_df = stdev_df
 new_df.write.format("csv").mode("overwrite").option("header","true").save("s3a://vvittanala/part-three.csv")
+# written new_df as a csv file in s3a bucket
+
 
 
 

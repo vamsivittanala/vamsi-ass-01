@@ -45,52 +45,15 @@ splitDF = df.withColumn('WeatherStation', df['_c0'].substr(5, 6)) \
 splitDF.printSchema()
 splitDF.show(5)
 
-# splitDF.write.format("csv").mode("overwrite").option("header", "true").save("s3a://vvittanala/90-uncompressed.csv")
-# splitDF.write.format("csv").mode("overwrite").option("header", "true").option("compression", "lz4").save("s3a://vvittanala/90-compressed.csv")
+splitDF.write.format("csv").mode("overwrite").option("header", "true").save("s3a://vvittanala/90-uncompressed.csv")
+splitDF.write.format("csv").mode("overwrite").option("header", "true").option("compression", "lz4").save("s3a://vvittanala/90-compressed.csv")
 
 
-# cols_df = splitDF.coalesce(1)
-# cols_df.write.format("csv").mode("overwrite").option("header", "true").save("s3a://vvittanala/90.csv")
+cols_df = splitDF.coalesce(1)
+cols_df.write.format("csv").mode("overwrite").option("header", "true").save("s3a://vvittanala/90.csv")
 
-# splitDF.write.format("parquet").mode("overwrite").option("header", "true").save("s3a://vvittanala/90.parquet")
-
-temp_df = splitDF.filter((splitDF["AirTemperature"] >= -40) & (splitDF["AirTemperature"] <= 50))
-# created a temp_df variable to filter temperature values in human survival values
-
-ymfilter_df = temp_df.select(
-    year("ObservationDate").alias("year"),
-    month("ObservationDate").alias("month"),
-    "AirTemperature"
-)
-# selected a columns as ObservationDate, AirTemperture and extracted it into a year & month column
-
-avg_df = ymfilter_df.groupBy("year", "month").agg(avg("AirTemperature").alias("avg_temperature"))
-
-stdev_df = avg_df.agg(stddev("avg_temperature").alias("stddev_temperature"))
+splitDF.write.format("parquet").mode("overwrite").option("header", "true").save("s3a://vvittanala/90.parquet")
 
 
-sdev_df = ymfilter_df.groupBy("year", "month").agg(stddev("AirTemperature").alias("stddev_temperature"))
-
-# Join average and standard deviation DataFrames
-joined_df = avg_df.join(sdev_df, ["year", "month"], "inner")
-
-# Select the desired columns
-result_df = joined_df.select("avg_temperature", "stddev_temperature", "month", "year")
-
-# Show the resulting DataFrame
-result_df.show(12)
-result_df.write.format("parquet").mode("overwrite").option("header","true").save("s3a://vvittanala/part-three.parquet")
-
-
-
-first_year_df = sdev_df.limit(12)
-
-# Write to CSV file
-
-first_year_df.write.format("csv").mode("overwrite").option("header","true").save("s3a://vvittanala/part3-three.csv")
-
-
-# Show the first 12 records (for verification)
-first_year_df.show(12)
 
 spark.stop()
