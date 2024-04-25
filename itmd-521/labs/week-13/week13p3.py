@@ -29,7 +29,7 @@ ymfilter_df = temp_df.select(
     month("ObservationDate").alias("month"),
     "AirTemperature"
 )
-# selected a columns as ObservationDate, AirTemperture and extracted it into a year & month column
+# selected a columns as ObservationDate, AirTemperture and extracted it into a year & month colum
 
 avg_df = ymfilter_df.groupBy("year", "month").agg(avg("AirTemperature").alias("avg_temperature"))
 
