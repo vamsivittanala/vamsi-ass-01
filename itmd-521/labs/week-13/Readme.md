@@ -119,7 +119,7 @@ Take only 12 records (the month and standard deviations) and write this to csv f
 ## Part Three Screenshot
 
 
-!["part3"](./images-week-13/part3.png "part3")
+!["Part3"](./images-week-13/part3.png)
 
 
 ## Deliverable
