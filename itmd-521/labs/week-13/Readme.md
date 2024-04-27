@@ -118,6 +118,7 @@ Using your assigned dataset, find the Average temperature per month per year. Th
 Take only 12 records (the month and standard deviations) and write this to csv file named `part-three.csv`
 ## Part Three Screenshot
 
+
 !["part3"](./images-week-13/part3.png "part3")
 
 
